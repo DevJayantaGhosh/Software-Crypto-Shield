@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Errors;
 
-namespace KeyGenerator.Errors
+public static class ExitCodes
 {
-    internal class ExitCodes
-    {
-    }
+    public const int Success = 0;
+    public const int Validation = 1;
+    public const int CryptoFailure = 2;
+    public const int Unexpected = 3;
 }

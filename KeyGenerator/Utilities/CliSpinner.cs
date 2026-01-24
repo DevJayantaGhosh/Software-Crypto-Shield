@@ -1,5 +1,4 @@
 ﻿using Spectre.Console;
-using System;
 
 namespace KeyGenerator.Utilities;
 
@@ -17,7 +16,7 @@ public static class CliSpinner
         }
 
         AnsiConsole.Status()
-            .Spinner(Spinner.Known.Dots)
+            .Spinner(Spinner.Known.Material)  //  ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧
             .SpinnerStyle(Style.Parse("cyan"))
             .Start(message, _ => action());
     }
