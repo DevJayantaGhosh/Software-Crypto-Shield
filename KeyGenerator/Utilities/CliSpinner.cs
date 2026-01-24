@@ -16,7 +16,7 @@ public static class CliSpinner
         }
 
         AnsiConsole.Status()
-            .Spinner(Spinner.Known.Material)  //  ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧
+            .Spinner(Spinner.Known.Material)  
             .SpinnerStyle(Style.Parse("cyan"))
             .Start(message, _ => action());
     }
