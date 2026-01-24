@@ -3,6 +3,7 @@ using KeyGenerator.Utilities;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using KeyGenerator.Commands;
+using KeyGenerator.Models;
 
 namespace KeyGenerator;
 
@@ -12,14 +13,13 @@ public class Program
 
     public static async Task<int> Main(string[] args)
     {
-        // 1. DIRECT EXECUTION MODE (e.g., "KeyGenerator.exe generate rsa --json")
+        // 1. DIRECT EXECUTION MODE
         if (args.Length > 0)
         {
             return await RunCommand(args);
         }
 
         // 2. Interactive Mode
-        // Show Banner and Help ONCE at startup
         AppBannerPrinter.Print();
         ShowInteractiveHelp();
 
@@ -30,7 +30,6 @@ public class Program
                     .AllowEmpty()
             );
 
-            // Handle Exit
             if (input.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
             {
                 AnsiConsole.MarkupLine("[bold green]Goodbye![/]");
@@ -39,7 +38,6 @@ public class Program
 
             if (string.IsNullOrWhiteSpace(input)) continue;
 
-            // Run Command
             var argsArray = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var exitCode = await RunCommand(argsArray);
 
@@ -55,12 +53,13 @@ public class Program
         {
             config.SetApplicationName("cryptoshield-keygen");
             config.SetApplicationVersion("1.0.0");
-            config.AddBranch("generate", g =>
+
+            // Use AddBranch<GenerateOptions> and SetDefaultCommand
+            config.AddBranch<GenerateOptions>("generate", g =>
             {
                 g.SetDescription("Generate RSA or ECDSA key pairs");
 
-                g.AddCommand<GenerateCommand>("")
-                 .WithDescription("Show generate options");
+                g.SetDefaultCommand<GenerateCommand>();
 
                 g.AddCommand<GenerateRsaCommand>("rsa")
                  .WithDescription("RSA keys (default: size=2048, out=keys/)")
@@ -80,7 +79,6 @@ public class Program
         }
         catch (Exception ex)
         {
-            // Only print error if not pure JSON output needed (basic error handling)
             AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
             return ExitCodes.Unexpected;
         }
