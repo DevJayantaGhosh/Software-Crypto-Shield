@@ -12,12 +12,16 @@ public class Program
 
     public static async Task<int> Main(string[] args)
     {
-        if (!_bannerShown)
+        // 1. DIRECT EXECUTION MODE (e.g., "KeyGenerator.exe generate rsa --json")
+        if (args.Length > 0)
         {
-            AppBannerPrinter.Print();
-            ShowInteractiveHelp();
-            _bannerShown = true;
+            return await RunCommand(args);
         }
+
+        // 2. Interactive Mode
+        // Show Banner and Help ONCE at startup
+        AppBannerPrinter.Print();
+        ShowInteractiveHelp();
 
         while (true)
         {
@@ -26,6 +30,7 @@ public class Program
                     .AllowEmpty()
             );
 
+            // Handle Exit
             if (input.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
             {
                 AnsiConsole.MarkupLine("[bold green]Goodbye![/]");
@@ -34,6 +39,7 @@ public class Program
 
             if (string.IsNullOrWhiteSpace(input)) continue;
 
+            // Run Command
             var argsArray = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var exitCode = await RunCommand(argsArray);
 
@@ -51,7 +57,7 @@ public class Program
             config.SetApplicationVersion("1.0.0");
             config.AddBranch("generate", g =>
             {
-                g.SetDescription("Generate RSA or ECDSA key pairs for software signing");
+                g.SetDescription("Generate RSA or ECDSA key pairs");
 
                 g.AddCommand<GenerateCommand>("")
                  .WithDescription("Show generate options");
@@ -74,6 +80,7 @@ public class Program
         }
         catch (Exception ex)
         {
+            // Only print error if not pure JSON output needed (basic error handling)
             AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
             return ExitCodes.Unexpected;
         }
