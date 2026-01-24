@@ -1,4 +1,5 @@
-﻿using KeyGenerator.Models;
+﻿using Errors;
+using KeyGenerator.Models;
 using KeyGenerator.Services.Factory;
 using KeyGenerator.Utilities;
 using Spectre.Console;
@@ -10,55 +11,14 @@ public sealed class GenerateCommand : Command<GenerateOptions>
 {
     public override int Execute(CommandContext context, GenerateOptions settings)
     {
-        // -------------------------
-        // Banner (disabled for JSON or Silent)
-        // -------------------------
-        if (!settings.JsonOnly && !settings.Silent)
-        {
-            AppBannerPrinter.Print();
-        }
 
-        // -------------------------
-        // Prepare options
-        // -------------------------
-        var options = settings; // already a CommandSettings model
+        AnsiConsole.MarkupLine("[bold yellow]Subcommands:[/]");
+        AnsiConsole.MarkupLine("  [cyan]rsa[/] [dim]- RSA 2048/4096[/]");
+        AnsiConsole.MarkupLine("  [cyan]ecdsa[/] [dim]- ECDSA P-256/P-384/P-521[/]");
+        AnsiConsole.MarkupLine("\n[dim]Examples:[/]");
+        AnsiConsole.MarkupLine("  [green]generate rsa -s 4096 -o keys[/]");
+        AnsiConsole.MarkupLine("  [green]generate ecdsa --curve P-384[/]");
 
-        // -------------------------
-        // Key generator service
-        // -------------------------
-        var service = KeyGeneratorFactory.Create(options);
-
-        KeyGenerationResult result = null!;
-
-        // -------------------------
-        // Spinner for long operations
-        // -------------------------
-        CliSpinner.Run(
-            enabled: !settings.JsonOnly && !settings.Silent,
-            message: "Generating cryptographic keys...",
-            action: () =>
-            {
-                result = service.GenerateAsync(options).GetAwaiter().GetResult();
-            }
-        );
-
-        // -------------------------
-        // Output results
-        // -------------------------
-        if (settings.JsonOnly)
-        {
-            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(
-                result,
-                new System.Text.Json.JsonSerializerOptions { WriteIndented = true }
-            ));
-        }
-        else
-        {
-            AnsiConsole.MarkupLine("[bold green]✔ Keys generated successfully[/]");
-            AnsiConsole.MarkupLine($"[grey]Public :[/] {result.PublicKeyPath}");
-            AnsiConsole.MarkupLine($"[grey]Private:[/] {result.PrivateKeyPath}");
-        }
-
-        return 0;
+        return ExitCodes.Success;
     }
 }

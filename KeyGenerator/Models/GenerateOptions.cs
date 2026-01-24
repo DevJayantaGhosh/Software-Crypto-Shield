@@ -18,7 +18,7 @@ public sealed class GenerateOptions : CommandSettings
 
     [CommandOption("-o|--out")]
     [DefaultValue("keys")]
-    public string OutputDir { get; init; }
+    public string? OutputDir { get; init; }
 
     [CommandOption("-j|--json")]
     public bool JsonOnly { get; init; }
