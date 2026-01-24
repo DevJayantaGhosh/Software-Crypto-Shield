@@ -1,0 +1,6 @@
+# From root - Creates standalone EXEs
+dotnet publish KeyGenerator -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./publish/win-x64/
+
+dotnet publish SoftwareSigner -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./publish/win-x64/
+
+dotnet publish SoftwareVerifier -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./publish/win-x64/
