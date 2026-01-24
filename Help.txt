@@ -1,6 +1,11 @@
 # From root - Creates standalone EXEs
-dotnet publish KeyGenerator -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./publish/win-x64/
+dotnet publish KeyGenerator -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=false -o ./publish/win-x64/
 
-dotnet publish SoftwareSigner -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./publish/win-x64/
+dotnet publish SoftwareSigner -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=false -o ./publish/win-x64/
 
 dotnet publish SoftwareVerifier -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./publish/win-x64/
+
+
+
+--------------------
+SoftwareSigner.exe sign -c C:\JayantaGhosh\IITM_Project\JG2 -k C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\keys\rsa-2048-private.pem
