@@ -53,7 +53,7 @@ public sealed class GenerateRsaCommand : Command<GenerateOptions>
             return;
         }
 
-        AnsiConsole.MarkupLine("[bold green]✔ RSA keys generated![/]");
+        AnsiConsole.MarkupLine("[bold green] RSA keys generated![/]");
         AnsiConsole.MarkupLine($"[grey]Size:[/] [cyan]{result.KeySize} bits[/]");
         AnsiConsole.MarkupLine($"[grey]Public:[/] [cyan]{result.PublicKeyPath}[/]");
         AnsiConsole.MarkupLine($"[grey]Private:[/] [cyan]{result.PrivateKeyPath}[/]");

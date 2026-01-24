@@ -54,7 +54,7 @@ public sealed class GenerateEcdsaCommand : Command<GenerateOptions>
             return;
         }
 
-        AnsiConsole.MarkupLine("[bold green]✔ ECDSA keys generated![/]");
+        AnsiConsole.MarkupLine("[bold green] ECDSA keys generated![/]");
         AnsiConsole.MarkupLine($"[grey]Curve:[/] [cyan]{result.Curve}[/]");
         AnsiConsole.MarkupLine($"[grey]Public:[/] [cyan]{result.PublicKeyPath}[/]");
         AnsiConsole.MarkupLine($"[grey]Private:[/] [cyan]{result.PrivateKeyPath}[/]");

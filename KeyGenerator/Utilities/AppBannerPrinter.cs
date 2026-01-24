@@ -18,8 +18,6 @@ public static class AppBannerPrinter
 [grey]│[/] [dim]  Create RSA/ECDSA keys for secure software signing and authenticity verification              [/][grey]│[/]
 [grey]│[/] [dim]  Supported Algorithms : RSA(2048 bits / 4096 bits) | ECDSA(P-256/P-384/P-521)                 [/][grey]│[/]
 [grey]╰────────────────────────────────────────────────────────────────────────────────────────────────╯[/]
-
-[bold green]Type --help[/] [dim]for usage details.[/]
 ");
 
         AnsiConsole.Markup(
