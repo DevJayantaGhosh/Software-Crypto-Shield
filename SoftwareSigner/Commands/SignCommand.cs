@@ -22,7 +22,7 @@ public sealed class SignCommand : Command<SignOptions>
 
             CliSpinner.Run(
                 !settings.JsonOnly && !settings.Silent,
-                "Computing SHA512 hash and signing... ⠋",
+                "Computing SHA512 hash and signing... ",
                 () =>
                 {
                     signatureBase64 = service.SignAsync(
@@ -47,7 +47,7 @@ public sealed class SignCommand : Command<SignOptions>
             }
             else
             {
-                AnsiConsole.MarkupLine("[bold green]✔ Content Signed Successfully![/]");
+                AnsiConsole.MarkupLine("[bold green] Content Signed Successfully![/]");
                 AnsiConsole.MarkupLine($"[grey]Content Path:[/] [cyan]{settings.ContentPath}[/]");
                 AnsiConsole.MarkupLine($"[grey]Private Key :[/] [cyan]{settings.PrivateKeyPath}[/]");
                 AnsiConsole.MarkupLine($"[grey]Signature   :[/] [cyan]{settings.OutputPath}[/]");

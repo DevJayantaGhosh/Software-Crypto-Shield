@@ -32,7 +32,7 @@ public sealed class GenerateEcdsaCommand : Command<GenerateOptions>
 
             CliSpinner.Run(
                 !settings.JsonOnly && !settings.Silent,
-                "Generating [bold cyan]ECDSA[/] keys... ⠋",
+                "Generating [bold cyan]ECDSA[/] keys... ",
                 () => result = service.GenerateAsync(ecdsaOptions).GetAwaiter().GetResult()
             );
 

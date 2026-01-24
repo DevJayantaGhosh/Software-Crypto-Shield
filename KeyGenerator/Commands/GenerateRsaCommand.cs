@@ -31,7 +31,7 @@ public sealed class GenerateRsaCommand : Command<GenerateOptions>
 
             CliSpinner.Run(
                 !settings.JsonOnly && !settings.Silent,
-                "Generating [bold cyan]RSA[/] keys... ⠋",
+                "Generating [bold cyan]RSA[/] keys... ",
                 () => result = service.GenerateAsync(rsaOptions).GetAwaiter().GetResult()
             );
 
