@@ -71,7 +71,7 @@ public sealed class VerifyCommand : Command<VerifyOptions>
                 else
                 {
                     AnsiConsole.MarkupLine("\n[bold red] INVALID SIGNATURE ! [/]");
-                    AnsiConsole.MarkupLine("[red]Warning: Content may have been tampered with or the key is incorrect.[/]");
+                    AnsiConsole.MarkupLine("[red]Warning: Content may have been tampered or the key is incorrect.[/]");
                 }
 
                 if (settings.Verbose)
