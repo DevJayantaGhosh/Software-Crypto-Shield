@@ -8,13 +8,31 @@ dotnet publish SoftwareVerifier -c Release -r win-x64 --self-contained true -p:P
 
 
 --------------------
+--Normal RSA Keys
+Public: C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\keys\rsa-2048-public.pem
+Private: C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\keys\rsa-2048-private.pem
+
 SoftwareSigner.exe sign -c C:\JayantaGhosh\IITM_Project\JG2 -k C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\keys\rsa-2048-private.pem
+SoftwareVerifier.exe verify -c "C:\JayantaGhosh\IITM_Project\JG2" -k "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\keys\rsa-2048-public.pem" -s "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\signature.sig"
+SoftwareVerifier.exe verify -c "C:\Users\rakhi\Downloads\IISC application" -k "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\keys\rsa-2048-public.pem" -s "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\signature.sig"
 
-verify -c C:\JayantaGhosh\IITM_Project\JG2 -k C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\keys\rsa-2048-public.pem -s C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\my2.sig
 
-SoftwareSigner.exe sign -c "C:\Users\rakhi\Downloads\IISC application" -k "C:\Users\rakhi\Downloads\keys\ecdsa-nistP256-private.pem"
+--Protected RSA Keys
+KeyGenerator.exe generate rsa -s 4096 -o ./mykeys -p MyPass -v
 
-SoftwareVerifier.exe verify -c "C:\Users\rakhi\Downloads\IISC application" -k "C:\Users\rakhi\Downloads\keys\ecdsa-nistP256-public.pem" -s "C:\Users\rakhi\Downloads\signature.sig"
+Public: C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\mykeys\rsa-4096-public.pem
+Private: C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\mykeys\rsa-4096-private.pem
+
+SoftwareSigner.exe sign -c C:\JayantaGhosh\IITM_Project\JG2 -k C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\mykeys\rsa-4096-private.pem
+SoftwareSigner.exe sign -c C:\JayantaGhosh\IITM_Project\JG2 -k C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\mykeys\rsa-4096-private.pem -p MyPass222
+SoftwareSigner.exe sign -c C:\JayantaGhosh\IITM_Project\JG2 -k C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\mykeys\rsa-4096-public.pem -p MyPass222
+SoftwareSigner.exe sign -c C:\JayantaGhosh\IITM_Project\JG2 -k C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\mykeys\rsa-4096-public.pem -p MyPass
+
+SoftwareVerifier.exe verify -c "C:\JayantaGhosh\IITM_Project\JG2" -k "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\mykeys\rsa-4096-public.pem" -s "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\signature.sig"
+SoftwareVerifier.exe verify -c "C:\Users\rakhi\Downloads\IISC application" -k "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\mykeys\rsa-4096-public.pem" -s "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\signature.sig"
+
+
+
 
 
 

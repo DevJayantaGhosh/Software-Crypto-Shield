@@ -2,5 +2,5 @@
 
 public interface ISignatureService
 {
-    Task<string> SignAsync(string contentPath, string keyPath, string outPath);
+    Task<string> SignAsync(string contentPath, string keyPath, string outPath, string? password = null);
 }

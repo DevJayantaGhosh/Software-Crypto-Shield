@@ -12,11 +12,8 @@ public sealed class SignCommand : Command<SignOptions>
 {
     public override int Execute(CommandContext context, SignOptions settings)
     {
-        // NO Banner here (Handled by Program.cs)
-
         try
         {
-            // Use Interface-based service
             ISignatureService service = new SignatureService();
             string signatureBase64 = "";
 
@@ -28,12 +25,12 @@ public sealed class SignCommand : Command<SignOptions>
                     signatureBase64 = service.SignAsync(
                         settings.ContentPath,
                         settings.PrivateKeyPath,
-                        settings.OutputPath
+                        settings.OutputPath,
+                        settings.Password
                     ).GetAwaiter().GetResult();
                 }
             );
 
-            // Handle Output (JSON vs Interactive)
             if (settings.JsonOnly)
             {
                 var result = new
@@ -59,7 +56,7 @@ public sealed class SignCommand : Command<SignOptions>
                 }
             }
 
-            return 0; // Success
+            return 0;
         }
         catch (Exception ex)
         {
@@ -69,12 +66,14 @@ public sealed class SignCommand : Command<SignOptions>
             }
             else
             {
-                AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
+                string safeMessage = Markup.Escape(ex.Message);
+                AnsiConsole.MarkupLine($"[red]Error: {safeMessage}[/]");
+
                 if (settings.Verbose)
                     AnsiConsole.WriteException(ex);
             }
 
-            return 1; // Error
+            return 1;
         }
     }
 }

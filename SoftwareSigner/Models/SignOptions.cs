@@ -16,7 +16,12 @@ public sealed class SignOptions : CommandSettings
     [CommandOption("-o|--out")]
     [Description("Output path for signature file")]
     [DefaultValue("signature.sig")]
-    public string OutputPath { get; init; } = "signature.sig"; 
+    public string OutputPath { get; init; } = "signature.sig";
+
+    // Password protection
+    [CommandOption("-p|--password")]
+    [Description("Password for the private key (if encrypted)")]
+    public string? Password { get; init; }
 
     [CommandOption("-j|--json")]
     [Description("Output result as JSON")]

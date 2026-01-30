@@ -54,7 +54,6 @@ public class Program
             config.SetApplicationName("cryptoshield-keygen");
             config.SetApplicationVersion("1.0.0");
 
-            // Use AddBranch<GenerateOptions> and SetDefaultCommand
             config.AddBranch<GenerateOptions>("generate", g =>
             {
                 g.SetDescription("Generate RSA or ECDSA key pairs");
@@ -63,11 +62,19 @@ public class Program
 
                 g.AddCommand<GenerateRsaCommand>("rsa")
                  .WithDescription("RSA keys (default: size=2048, out=keys/)")
-                 .WithExample("rsa -s 4096 -o ./mykeys -v");
+                 .WithExample("generate rsa")
+                 .WithExample("generate rsa -p MySecretPassword")
+                 .WithExample("generate rsa -s 4096 -o ./mykeys -v")
+                 .WithExample("generate rsa", "-s", "4096", "-o", "./prod-keys", "-p", "MySecretPassword", "--verbose");
 
                 g.AddCommand<GenerateEcdsaCommand>("ecdsa")
                  .WithDescription("ECDSA keys (default: P-256, out=keys/)")
-                 .WithExample("ecdsa --curve P-384 -o ./mykeys -j");
+                 .WithExample("generate ecdsa")
+                 .WithExample("generate ecdsa -p MySecretPassword")
+                 .WithExample("generate ecdsa", "--curve", "P-384")
+                 .WithExample("generate ecdsa", "-p", "MySecret", "-o", "./keys")
+                 .WithExample("generate ecdsa --curve P-384 -o ./mykeys -j")
+                 .WithExample("generate ecdsa", "--curve", "P-521", "-o", "./prod-keys", "-p", "MySecretPassword", "--json");
             });
         });
 
@@ -88,14 +95,19 @@ public class Program
     {
         var table = new Table()
             .AddColumns("Command", "Description")
+            // Basics
             .AddRow("[cyan]--help / -h[/]", "[dim]Show this help[/]")
             .AddRow("[cyan]--version / -v[/]", "[dim]Show version[/]")
-            .AddRow("[cyan]generate rsa[/]", "[dim]RSA (default: 2048, keys/)[/]")
-            .AddRow("[cyan]generate rsa --help[/]", "[dim]Find other options[/]")
-            .AddRow("[cyan]generate rsa -s 4096 -o ./mykeys[/]", "[dim]Full command example[/]")
-            .AddRow("[cyan]generate ecdsa[/]", "[dim]ECDSA (default: P-256, keys/)[/]")
-            .AddRow("[cyan]generate ecdsa --help[/]", "[dim]Find other options[/]")
-            .AddRow("[cyan]generate ecdsa -c P-384 -o ./mykeys[/]", "[dim]Full command example[/]");
+
+            // RSA Examples
+            .AddRow("[cyan]generate rsa[/]", "[dim]RSA Default (2048, Plain, ./keys)[/]")
+            .AddRow("[cyan]generate rsa -p MySecret[/]", "[dim]RSA Encrypted[/]")
+            .AddRow("[cyan]generate rsa -s 4096 -o ./mykeys -p MyPass -v[/]", "[dim]RSA Full (4096, Encrypted, Custom Dir, Verbose)[/]")
+
+            // ECDSA Examples
+            .AddRow("[cyan]generate ecdsa[/]", "[dim]ECDSA Default (P-256, Plain, ./keys)[/]")
+            .AddRow("[cyan]generate ecdsa -p MySecret[/]", "[dim]ECDSA Encrypted[/]")
+            .AddRow("[cyan]generate ecdsa -c P-384 -o ./mykeys -p MyPass -j[/]", "[dim]ECDSA Full (P-384, Encrypted, Custom Dir, JSON)[/]");
 
         AnsiConsole.MarkupLine("[bold yellow]Available Commands:[/]");
         AnsiConsole.Write(table);

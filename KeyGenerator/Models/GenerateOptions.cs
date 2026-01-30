@@ -20,6 +20,11 @@ public sealed class GenerateOptions : CommandSettings
     [DefaultValue("keys")]
     public string? OutputDir { get; init; }
 
+    // Password Protection ---
+    [CommandOption("-p|--password")]
+    [Description("Encrypt private key with a password")]
+    public string? Password { get; init; }
+
     [CommandOption("-j|--json")]
     public bool JsonOnly { get; init; }
 

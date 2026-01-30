@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using SoftwareVerifier.Services.Interfaces;
+using SoftwareSigner.Services.Interfaces;
 
-namespace SoftwareVerifier.Services.Implementations;
+namespace SoftwareSigner.Services.Implementations;
 
 public class HashService : IHashService
 {
@@ -27,7 +27,6 @@ public class HashService : IHashService
             foreach (var file in files)
             {
                 // Critical: Normalize separators to forward slash '/'
-                // This ensures the hash is identical regardless of OS (Windows/Linux)
                 string relativePath = Path.GetRelativePath(path, file).Replace("\\", "/");
                 byte[] pathBytes = Encoding.UTF8.GetBytes(relativePath);
 

@@ -9,14 +9,11 @@ public class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        // 1. DIRECT EXECUTION MODE (e.g., "SoftwareSigner.exe sign -c ./bin -k key.pem")
         if (args.Length > 0)
         {
             return await RunCommand(args);
         }
 
-        // 2. Interactive Mode
-        // Show Banner and Help ONCE at startup
         AppBannerPrinter.Print();
         ShowInteractiveHelp();
 
@@ -27,7 +24,6 @@ public class Program
                     .AllowEmpty()
             );
 
-            // Handle Exit
             if (input.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
             {
                 AnsiConsole.MarkupLine("[bold green]Goodbye![/]");
@@ -36,7 +32,6 @@ public class Program
 
             if (string.IsNullOrWhiteSpace(input)) continue;
 
-            // Run Command
             var argsArray = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var exitCode = await RunCommand(argsArray);
 
@@ -55,7 +50,12 @@ public class Program
 
             config.AddCommand<SignCommand>("sign")
                 .WithDescription("Sign a file or recursive folder content")
-                .WithExample("sign -c ./build -k ./private.pem -o release.sig");
+                // Example 1: Basic
+                .WithExample("sign", "-c", "./bin", "-k", "key.pem")
+                // Example 2: With Password
+                .WithExample("sign", "-c", "./bin", "-k", "key.pem", "-p", "MySecret")
+                // Example 3: Full
+                .WithExample("sign", "-c", "./bin", "-k", "key.pem", "-o", "release.sig", "-p", "MySecret");
         });
 
         if (args.Length == 0) return 0;
@@ -79,6 +79,7 @@ public class Program
             .AddRow("[cyan]--version / -v[/]", "[dim]Show version[/]")
             .AddRow("[cyan]sign --help[/]", "[dim]Show signing options[/]")
             .AddRow("[cyan]sign -c <path> -k <key>[/]", "[dim]Basic signing[/]")
+            .AddRow("[cyan]sign -c <path> -k <key> -p <pass>[/]", "[dim]Sign with encrypted key[/]")
             .AddRow("[cyan]sign -c ./bin -k key.pem -o bin.sig[/]", "[dim]Full example[/]");
 
         AnsiConsole.MarkupLine("[bold yellow]Available Commands:[/]");

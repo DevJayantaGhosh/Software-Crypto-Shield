@@ -15,11 +15,9 @@ public sealed class VerifyCommand : Command<VerifyOptions>
 {
     public override int Execute(CommandContext context, VerifyOptions settings)
     {
-        // NO Banner here (Handled by Program.cs)
 
         try
         {
-            // 1. Direct instantiation (No DI)
             IHashService hashService = new HashService();
             bool isValid = false;
 
@@ -65,13 +63,13 @@ public sealed class VerifyCommand : Command<VerifyOptions>
             {
                 if (isValid)
                 {
-                    AnsiConsole.MarkupLine("\n[bold green] VALID SIGNATURE !  [/]");
+                    AnsiConsole.MarkupLine("\n[bold green] SIGNATURE VERIFICATION: SUCCESS !  [/]");
                     AnsiConsole.MarkupLine("[green]The content is authentic and has not been modified.[/]");
                 }
                 else
                 {
-                    AnsiConsole.MarkupLine("\n[bold red] INVALID SIGNATURE ! [/]");
-                    AnsiConsole.MarkupLine("[red]Warning: Content may have been tampered or the key is incorrect.[/]");
+                    AnsiConsole.MarkupLine("\n[bold red] SIGNATURE VERIFICATION: FAILED ! [/]");
+                    AnsiConsole.MarkupLine("[red]Error: Content may have been tampered or the key is incorrect.[/]");
                 }
 
                 if (settings.Verbose)
@@ -111,8 +109,19 @@ public sealed class VerifyCommand : Command<VerifyOptions>
         var pemReader = new PemReader(reader);
         var keyObject = pemReader.ReadObject();
 
-        if (keyObject is AsymmetricKeyParameter key) return key;
+        if (keyObject == null) throw new ArgumentException("Could not parse PEM file. Is it valid?");
 
-        throw new Exception($"Invalid PEM public key format in {path}");
+        if (keyObject is AsymmetricKeyParameter key)
+        {
+            // CRITICAL CHECK: Ensure user didn't pass a Private Key by mistake
+            if (key.IsPrivate)
+            {
+                throw new ArgumentException("The provided key is a PRIVATE key! verification requires a PUBLIC key. Please check your file path.");
+            }
+            return key;
+        }
+
+        throw new Exception($"Invalid PEM public key format in {path}. Found type: {keyObject.GetType().Name}");
     }
+
 }

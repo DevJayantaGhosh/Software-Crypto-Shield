@@ -24,7 +24,8 @@ public sealed class GenerateEcdsaCommand : Command<GenerateOptions>
                 JsonOnly = settings.JsonOnly,
                 Silent = settings.Silent,
                 Verbose = settings.Verbose,
-                Curve = settings.Curve
+                Curve = settings.Curve,
+                Password = settings.Password
             };
 
             var service = KeyGeneratorFactory.Create(ecdsaOptions);

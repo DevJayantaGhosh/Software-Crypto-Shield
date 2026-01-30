@@ -23,7 +23,8 @@ public sealed class GenerateRsaCommand : Command<GenerateOptions>
                 JsonOnly = settings.JsonOnly,
                 Silent = settings.Silent,
                 Verbose = settings.Verbose,
-                Curve = null
+                Curve = null,
+                Password = settings.Password
             };
 
             var service = KeyGeneratorFactory.Create(rsaOptions);

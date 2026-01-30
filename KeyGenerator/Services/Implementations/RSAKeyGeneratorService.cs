@@ -16,10 +16,29 @@ public sealed class RSAKeyGeneratorService : IKeyGeneratorService
 
         using var rsa = RSA.Create(options.Size);
 
+        // 1. Export Public Key
         var pub = rsa.ExportRSAPublicKeyPem();
-        var priv = rsa.ExportRSAPrivateKeyPem();
 
-        var dir = Path.GetFullPath(options.OutputDir);
+        // 2. Export Private Key
+        string priv;
+        if (!string.IsNullOrWhiteSpace(options.Password))
+        {
+            var pbeParams = new PbeParameters(
+                PbeEncryptionAlgorithm.Aes256Cbc,
+                HashAlgorithmName.SHA256,
+                iterationCount: 100_000);
+
+            priv = rsa.ExportEncryptedPkcs8PrivateKeyPem(
+                options.Password.ToCharArray(),
+                pbeParams);
+        }
+        else
+        {
+            priv = rsa.ExportRSAPrivateKeyPem();
+        }
+
+        // 3. Save Files
+        var dir = Path.GetFullPath(options.OutputDir ?? "keys");
         Directory.CreateDirectory(dir);
 
         var pubPath = Path.Combine(dir, $"rsa-{options.Size}-public.pem");

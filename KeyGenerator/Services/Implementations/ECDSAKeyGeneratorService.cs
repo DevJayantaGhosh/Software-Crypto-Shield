@@ -21,10 +21,30 @@ public sealed class ECDSAKeyGeneratorService : IKeyGeneratorService
 
         using var ecdsa = ECDsa.Create(curve);
 
+        // 1. Export Public Key (Always Cleartext)
         var pub = ecdsa.ExportSubjectPublicKeyInfoPem();
-        var priv = ecdsa.ExportPkcs8PrivateKeyPem();
 
-        var dir = Path.GetFullPath(options.OutputDir);
+        // 2. Export Private Key (Encrypted or Cleartext)
+        string priv;
+        if (!string.IsNullOrWhiteSpace(options.Password))
+        {
+            // Use standard PBE (Password Based Encryption) settings
+            var pbeParams = new PbeParameters(
+                PbeEncryptionAlgorithm.Aes256Cbc,
+                HashAlgorithmName.SHA256,
+                iterationCount: 100_000);
+
+            priv = ecdsa.ExportEncryptedPkcs8PrivateKeyPem(
+                options.Password.ToCharArray(),
+                pbeParams);
+        }
+        else
+        {
+            priv = ecdsa.ExportPkcs8PrivateKeyPem();
+        }
+
+        // 3. Save Files
+        var dir = Path.GetFullPath(options.OutputDir ?? "keys");
         Directory.CreateDirectory(dir);
 
         var curveName = curve.Oid?.FriendlyName ?? "P-256";
