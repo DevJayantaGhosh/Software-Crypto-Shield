@@ -16,7 +16,12 @@ public sealed class SignCommand : Command<SignOptions>
         {
             ISignatureService service = new SignatureService();
             string signatureBase64 = "";
-            bool usingKeyString = !string.IsNullOrWhiteSpace(settings.PrivateKeyString);
+
+            // Resolve private key string: prefer Spectre-parsed value, fall back to pre-extracted value
+            string? resolvedKeyString = !string.IsNullOrWhiteSpace(settings.PrivateKeyString)
+                ? settings.PrivateKeyString
+                : Program.ExtractedPrivateKeyString;
+            bool usingKeyString = !string.IsNullOrWhiteSpace(resolvedKeyString);
 
             CliSpinner.Run(
                 !settings.JsonOnly && !settings.Silent,
@@ -28,7 +33,7 @@ public sealed class SignCommand : Command<SignOptions>
                         // Key-string mode: returns Base64 signature string, no file written
                         signatureBase64 = service.SignWithKeyStringAsync(
                             settings.ContentPath,
-                            settings.PrivateKeyString!,
+                            resolvedKeyString!,
                             settings.Password
                         ).GetAwaiter().GetResult();
                     }

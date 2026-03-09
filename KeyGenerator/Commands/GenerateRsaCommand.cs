@@ -4,6 +4,7 @@ using KeyGenerator.Services.Factory;
 using KeyGenerator.Utilities;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 namespace KeyGenerator.Commands;
@@ -66,7 +67,11 @@ public sealed class GenerateRsaCommand : Command<GenerateOptions>
                     passwordProtected = !string.IsNullOrEmpty(result.PrivateKeyString) &&
                                         result.PrivateKeyString.Contains("ENCRYPTED")
                 };
-                Console.WriteLine(JsonSerializer.Serialize(jsonObj, new JsonSerializerOptions { WriteIndented = true }));
+                Console.WriteLine(JsonSerializer.Serialize(jsonObj, new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                }));
             }
             else
             {

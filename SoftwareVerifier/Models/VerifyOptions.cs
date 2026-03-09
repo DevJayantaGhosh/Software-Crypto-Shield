@@ -40,11 +40,16 @@ public sealed class VerifyOptions : CommandSettings
 
     public override ValidationResult Validate()
     {
+        // Check both Spectre-parsed value and pre-extracted value (from Program.ExtractedPublicKeyString)
+        bool hasKeyPath = !string.IsNullOrWhiteSpace(PublicKeyPath);
+        bool hasKeyString = !string.IsNullOrWhiteSpace(PublicKeyString)
+                         || !string.IsNullOrWhiteSpace(Program.ExtractedPublicKeyString);
+
         // Public key: must provide exactly one source
-        if (string.IsNullOrWhiteSpace(PublicKeyPath) && string.IsNullOrWhiteSpace(PublicKeyString))
+        if (!hasKeyPath && !hasKeyString)
             return ValidationResult.Error("You must provide either --key (-k) or --publickeystring.");
 
-        if (!string.IsNullOrWhiteSpace(PublicKeyPath) && !string.IsNullOrWhiteSpace(PublicKeyString))
+        if (hasKeyPath && hasKeyString)
             return ValidationResult.Error("Provide only one of --key (-k) or --publickeystring, not both.");
 
         // Signature: must provide exactly one source

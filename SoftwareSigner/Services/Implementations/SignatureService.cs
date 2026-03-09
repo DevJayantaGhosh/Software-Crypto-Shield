@@ -48,10 +48,51 @@ public class SignatureService : ISignatureService
         return Convert.ToBase64String(signature);
     }
 
+    /// <summary>
+    /// Normalizes a PEM string that may have been copied from JSON output or other encoded sources.
+    /// Handles: JSON unicode escapes (\uXXXX), literal \n/\r/\t, carriage returns, extra whitespace.
+    /// </summary>
+    private static string NormalizePem(string pem)
+    {
+        if (string.IsNullOrWhiteSpace(pem))
+            return pem;
+
+        // 1. Decode all JSON unicode escape sequences (\uXXXX → actual character)
+        pem = System.Text.RegularExpressions.Regex.Replace(pem, @"\\u([0-9A-Fa-f]{4})", match =>
+        {
+            int codePoint = Convert.ToInt32(match.Groups[1].Value, 16);
+            return ((char)codePoint).ToString();
+        });
+
+        // 2. Replace literal two-char escape sequences with actual characters
+        //    (These appear when PEM is copied from JSON string values)
+        if (!pem.Contains('\n') || pem.TrimEnd().EndsWith("-----"))
+        {
+            pem = pem.Replace("\\n", "\n");
+        }
+        pem = pem.Replace("\\r", "\r");
+        pem = pem.Replace("\\t", "\t");
+
+        // 3. Normalize line endings: \r\n → \n, standalone \r → \n
+        pem = pem.Replace("\r\n", "\n").Replace("\r", "\n");
+
+        // 4. Remove any surrounding quotes (single or double) that may have been included
+        pem = pem.Trim();
+        if ((pem.StartsWith("\"") && pem.EndsWith("\"")) || (pem.StartsWith("'") && pem.EndsWith("'")))
+        {
+            pem = pem[1..^1].Trim();
+        }
+
+        return pem;
+    }
+
     private AsymmetricKeyParameter LoadPrivateKeyFromString(string pemContent, string? password)
     {
         if (string.IsNullOrWhiteSpace(pemContent))
             throw new ArgumentException("Private key string is empty or null.");
+
+        // Normalize PEM from JSON output (literal \n → real newlines, \u002B → +)
+        pemContent = NormalizePem(pemContent);
 
         using var reader = new StringReader(pemContent);
 

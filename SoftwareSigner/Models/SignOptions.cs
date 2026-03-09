@@ -42,10 +42,15 @@ public sealed class SignOptions : CommandSettings
 
     public override ValidationResult Validate()
     {
-        if (string.IsNullOrWhiteSpace(PrivateKeyPath) && string.IsNullOrWhiteSpace(PrivateKeyString))
+        // Check both Spectre-parsed value and pre-extracted value (from Program.ExtractedPrivateKeyString)
+        bool hasKeyPath = !string.IsNullOrWhiteSpace(PrivateKeyPath);
+        bool hasKeyString = !string.IsNullOrWhiteSpace(PrivateKeyString)
+                         || !string.IsNullOrWhiteSpace(Program.ExtractedPrivateKeyString);
+
+        if (!hasKeyPath && !hasKeyString)
             return ValidationResult.Error("You must provide either --key (-k) or --privatekeystring.");
 
-        if (!string.IsNullOrWhiteSpace(PrivateKeyPath) && !string.IsNullOrWhiteSpace(PrivateKeyString))
+        if (hasKeyPath && hasKeyString)
             return ValidationResult.Error("Provide only one of --key (-k) or --privatekeystring, not both.");
 
         return ValidationResult.Success();

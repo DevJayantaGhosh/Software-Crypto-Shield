@@ -36,7 +36,7 @@ public class Program
 
             if (string.IsNullOrWhiteSpace(input)) continue;
 
-            var argsArray = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var argsArray = ParseArguments(input);
             var exitCode = await RunCommand(argsArray);
 
             if (exitCode != ExitCodes.Success)
@@ -102,6 +102,48 @@ public class Program
             AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
             return ExitCodes.Unexpected;
         }
+    }
+
+    static string[] ParseArguments(string input)
+    {
+        var args = new List<string>();
+        var current = new System.Text.StringBuilder();
+        bool inDoubleQuotes = false;
+        bool inSingleQuotes = false;
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            char c = input[i];
+
+            if (c == '"' && !inSingleQuotes)
+            {
+                inDoubleQuotes = !inDoubleQuotes;
+                continue;
+            }
+
+            if (c == '\'' && !inDoubleQuotes)
+            {
+                inSingleQuotes = !inSingleQuotes;
+                continue;
+            }
+
+            if (c == ' ' && !inDoubleQuotes && !inSingleQuotes)
+            {
+                if (current.Length > 0)
+                {
+                    args.Add(current.ToString());
+                    current.Clear();
+                }
+                continue;
+            }
+
+            current.Append(c);
+        }
+
+        if (current.Length > 0)
+            args.Add(current.ToString());
+
+        return args.ToArray();
     }
 
     static void ShowInteractiveHelp()
