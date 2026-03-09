@@ -32,8 +32,68 @@ SoftwareVerifier.exe verify -c "C:\JayantaGhosh\IITM_Project\JG2" -k "C:\Users\r
 SoftwareVerifier.exe verify -c "C:\Users\rakhi\Downloads\IISC application" -k "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\mykeys\rsa-4096-public.pem" -s "C:\Users\rakhi\Downloads\IITM\Software-Crypto-Shield\publish\win-x64\signature.sig"
 
 
+--------------------
+-- KeyString Mode (NEW) --
+-- Outputs public/private key PEM strings to stdout instead of writing files.
+-- Useful for cloud/API/web portal scenarios where keys are returned as strings.
+-- Works with all existing parameters (size, curve, password, json, etc.)
+
+# RSA KeyString Examples:
+
+# Basic RSA keystring (2048, plain, console output)
+KeyGenerator.exe generate rsa --keystring
+
+# RSA 4096 keystring as JSON (ideal for cloud/API)
+KeyGenerator.exe generate rsa -s 4096 --keystring --json
+
+# RSA 4096 password-protected keystring as JSON
+KeyGenerator.exe generate rsa -s 4096 -p MySecretPassword --keystring --json
+
+# RSA 2048 password-protected keystring (console output)
+KeyGenerator.exe generate rsa -p MySecretPassword --keystring
 
 
+# ECDSA KeyString Examples:
+
+# Basic ECDSA keystring (P-256, plain, console output)
+KeyGenerator.exe generate ecdsa --keystring
+
+# ECDSA P-384 keystring as JSON (ideal for cloud/API)
+KeyGenerator.exe generate ecdsa --curve P-384 --keystring --json
+
+# ECDSA P-521 password-protected keystring as JSON
+KeyGenerator.exe generate ecdsa --curve P-521 -p MySecretPassword --keystring --json
+
+# ECDSA P-256 password-protected keystring (console output)
+KeyGenerator.exe generate ecdsa -p MySecretPassword --keystring
 
 
+--------------------
+-- SoftwareSigner: --privatekeystring Mode (NEW) --
+-- Pass a private key PEM string directly instead of a file path.
+-- Useful for cloud/API/web portal scenarios where keys are held in memory.
+-- Works with all existing parameters (password, json, output, etc.)
 
+# Sign with a private key string (instead of -k <file>):
+SoftwareSigner.exe sign -c C:\JayantaGhosh\IITM_Project\JG2 --privatekeystring "-----BEGIN RSA PRIVATE KEY-----\nMIIE...base64...\n-----END RSA PRIVATE KEY-----"
+
+# Sign with an encrypted private key string + password:
+SoftwareSigner.exe sign -c C:\JayantaGhosh\IITM_Project\JG2 --privatekeystring "-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIE...\n-----END ENCRYPTED PRIVATE KEY-----" -p MySecretPassword
+
+# Sign with key string and JSON output:
+SoftwareSigner.exe sign -c C:\JayantaGhosh\IITM_Project\JG2 --privatekeystring "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----" -o release.sig -j
+
+# NOTE: Use either -k (key file) OR --privatekeystring (key string), not both.
+
+
+# JSON output example (--keystring --json):
+# {
+#   "algorithm": "RSA",
+#   "keySize": 4096,
+#   "createdAtUtc": "2026-03-09T14:22:28.1234567+00:00",
+#   "publicKeyBytes": 800,
+#   "privateKeyBytes": 3272,
+#   "publicKey": "-----BEGIN RSA PUBLIC KEY-----\n...\n-----END RSA PUBLIC KEY-----",
+#   "privateKey": "-----BEGIN ENCRYPTED PRIVATE KEY-----\n...\n-----END ENCRYPTED PRIVATE KEY-----",
+#   "passwordProtected": true
+# }

@@ -8,5 +8,7 @@ public sealed record KeyGenerationResult(
     string? Curve,
     DateTimeOffset CreatedAtUtc,
     long PublicKeyBytes,
-    long PrivateKeyBytes
+    long PrivateKeyBytes,
+    string? PublicKeyString = null,
+    string? PrivateKeyString = null
 );

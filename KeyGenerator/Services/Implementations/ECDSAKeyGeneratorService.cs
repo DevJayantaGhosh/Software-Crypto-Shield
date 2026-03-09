@@ -43,11 +43,28 @@ public sealed class ECDSAKeyGeneratorService : IKeyGeneratorService
             priv = ecdsa.ExportPkcs8PrivateKeyPem();
         }
 
-        // 3. Save Files
+        var curveName = curve.Oid?.FriendlyName ?? "P-256";
+
+        // 3. KeyString mode: return key strings without writing files
+        if (options.KeyString)
+        {
+            return new KeyGenerationResult(
+                PublicKeyPath: string.Empty,
+                PrivateKeyPath: string.Empty,
+                Algorithm: AlgorithmType.ECDSA,
+                KeySize: 0,
+                Curve: curveName,
+                CreatedAtUtc: DateTimeOffset.UtcNow,
+                PublicKeyBytes: Encoding.ASCII.GetByteCount(pub),
+                PrivateKeyBytes: Encoding.ASCII.GetByteCount(priv),
+                PublicKeyString: pub,
+                PrivateKeyString: priv);
+        }
+
+        // 4. File mode: Save Files (existing behavior)
         var dir = Path.GetFullPath(options.OutputDir ?? "keys");
         Directory.CreateDirectory(dir);
 
-        var curveName = curve.Oid?.FriendlyName ?? "P-256";
         var pubPath = Path.Combine(dir, $"ecdsa-{curveName}-public.pem");
         var privPath = Path.Combine(dir, $"ecdsa-{curveName}-private.pem");
 

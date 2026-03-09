@@ -37,7 +37,23 @@ public sealed class RSAKeyGeneratorService : IKeyGeneratorService
             priv = rsa.ExportRSAPrivateKeyPem();
         }
 
-        // 3. Save Files
+        // 3. KeyString mode: return key strings without writing files
+        if (options.KeyString)
+        {
+            return new KeyGenerationResult(
+                PublicKeyPath: string.Empty,
+                PrivateKeyPath: string.Empty,
+                Algorithm: AlgorithmType.RSA,
+                KeySize: options.Size,
+                Curve: null,
+                CreatedAtUtc: DateTimeOffset.UtcNow,
+                PublicKeyBytes: Encoding.ASCII.GetByteCount(pub),
+                PrivateKeyBytes: Encoding.ASCII.GetByteCount(priv),
+                PublicKeyString: pub,
+                PrivateKeyString: priv);
+        }
+
+        // 4. File mode: Save Files (existing behavior)
         var dir = Path.GetFullPath(options.OutputDir ?? "keys");
         Directory.CreateDirectory(dir);
 

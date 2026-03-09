@@ -15,19 +15,22 @@ public sealed class VerifyCommand : Command<VerifyOptions>
 {
     public override int Execute(CommandContext context, VerifyOptions settings)
     {
-
         try
         {
             IHashService hashService = new HashService();
             bool isValid = false;
+            bool usingKeyString = !string.IsNullOrWhiteSpace(settings.PublicKeyString);
+            bool usingSignatureString = !string.IsNullOrWhiteSpace(settings.SignatureString);
 
             CliSpinner.Run(
                 !settings.JsonOnly && !settings.Silent,
                 "Verifying signature integrity... ",
                 () =>
                 {
-                    // A. Load Public Key
-                    var publicKey = LoadPublicKey(settings.PublicKeyPath);
+                    // A. Load Public Key (from file or string)
+                    var publicKey = usingKeyString
+                        ? LoadPublicKeyFromString(settings.PublicKeyString!)
+                        : LoadPublicKey(settings.PublicKeyPath!);
 
                     // B. Get correct Verifier (RSA or ECDSA) from Factory
                     ISignatureVerifier verifier = VerifierFactory.GetVerifier(publicKey);
@@ -36,11 +39,26 @@ public sealed class VerifyCommand : Command<VerifyOptions>
                     var contentHash = hashService.ComputeHashAsync(settings.ContentPath)
                                                  .GetAwaiter().GetResult();
 
-                    // D. Read Signature File
-                    if (!File.Exists(settings.SignaturePath))
-                        throw new FileNotFoundException($"Signature file not found: {settings.SignaturePath}");
+                    // D. Read Signature (from file or string)
+                    byte[] signatureBytes;
+                    if (usingSignatureString)
+                    {
+                        try
+                        {
+                            signatureBytes = Convert.FromBase64String(settings.SignatureString!);
+                        }
+                        catch (FormatException)
+                        {
+                            throw new ArgumentException("The --signaturestring value is not valid Base64. Please provide the signature as a Base64-encoded string.");
+                        }
+                    }
+                    else
+                    {
+                        if (!File.Exists(settings.SignaturePath))
+                            throw new FileNotFoundException($"Signature file not found: {settings.SignaturePath}");
 
-                    var signatureBytes = File.ReadAllBytes(settings.SignaturePath);
+                        signatureBytes = File.ReadAllBytes(settings.SignaturePath!);
+                    }
 
                     // E. Verify
                     isValid = verifier.VerifySignature(contentHash, signatureBytes, publicKey);
@@ -54,7 +72,9 @@ public sealed class VerifyCommand : Command<VerifyOptions>
                 {
                     status = isValid ? "valid" : "invalid",
                     content = settings.ContentPath,
-                    signature_file = settings.SignaturePath,
+                    keySource = usingKeyString ? "publickeystring" : "file",
+                    signatureSource = usingSignatureString ? "signaturestring" : "file",
+                    signature_file = usingSignatureString ? "(provided via --signaturestring)" : settings.SignaturePath,
                     timestamp = DateTime.UtcNow
                 };
                 Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
@@ -75,8 +95,14 @@ public sealed class VerifyCommand : Command<VerifyOptions>
                 if (settings.Verbose)
                 {
                     AnsiConsole.MarkupLine($"[grey]Content :[/] [cyan]{settings.ContentPath}[/]");
-                    AnsiConsole.MarkupLine($"[grey]Key     :[/] [cyan]{settings.PublicKeyPath}[/]");
-                    AnsiConsole.MarkupLine($"[grey]Sig     :[/] [cyan]{settings.SignaturePath}[/]");
+                    if (usingKeyString)
+                        AnsiConsole.MarkupLine($"[grey]Key     :[/] [cyan](provided via --publickeystring)[/]");
+                    else
+                        AnsiConsole.MarkupLine($"[grey]Key     :[/] [cyan]{settings.PublicKeyPath}[/]");
+                    if (usingSignatureString)
+                        AnsiConsole.MarkupLine($"[grey]Sig     :[/] [cyan](provided via --signaturestring)[/]");
+                    else
+                        AnsiConsole.MarkupLine($"[grey]Sig     :[/] [cyan]{settings.SignaturePath}[/]");
                 }
             }
 
@@ -100,7 +126,39 @@ public sealed class VerifyCommand : Command<VerifyOptions>
         }
     }
 
-    // Helper to load PEM key
+    // Load public key from PEM string
+    private AsymmetricKeyParameter LoadPublicKeyFromString(string pemContent)
+    {
+        if (string.IsNullOrWhiteSpace(pemContent))
+            throw new ArgumentException("Public key string is empty or null.");
+
+        using var reader = new StringReader(pemContent);
+        var pemReader = new PemReader(reader);
+        object? keyObject;
+
+        try
+        {
+            keyObject = pemReader.ReadObject();
+        }
+        catch (Exception ex)
+        {
+            throw new ArgumentException($"Failed to parse the public key string: {ex.Message}");
+        }
+
+        if (keyObject == null)
+            throw new ArgumentException("Could not read a valid key object from the provided key string. Is it a valid PEM?");
+
+        if (keyObject is AsymmetricKeyParameter key)
+        {
+            if (key.IsPrivate)
+                throw new ArgumentException("The provided key string contains a PRIVATE key! Verification requires a PUBLIC key.");
+            return key;
+        }
+
+        throw new ArgumentException($"Unknown key format in key string: {keyObject.GetType().Name}. Expected a public key.");
+    }
+
+    // Load public key from PEM file
     private AsymmetricKeyParameter LoadPublicKey(string path)
     {
         if (!File.Exists(path)) throw new FileNotFoundException($"Public key not found: {path}");
@@ -123,5 +181,4 @@ public sealed class VerifyCommand : Command<VerifyOptions>
 
         throw new Exception($"Invalid PEM public key format in {path}. Found type: {keyObject.GetType().Name}");
     }
-
 }

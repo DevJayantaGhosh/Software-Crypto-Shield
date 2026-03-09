@@ -24,7 +24,8 @@ public sealed class GenerateRsaCommand : Command<GenerateOptions>
                 Silent = settings.Silent,
                 Verbose = settings.Verbose,
                 Curve = null,
-                Password = settings.Password
+                Password = settings.Password,
+                KeyString = settings.KeyString
             };
 
             var service = KeyGeneratorFactory.Create(rsaOptions);
@@ -48,6 +49,40 @@ public sealed class GenerateRsaCommand : Command<GenerateOptions>
 
     static void OutputResult(KeyGenerationResult result, GenerateOptions settings)
     {
+        // KeyString mode: output key strings
+        if (settings.KeyString)
+        {
+            if (settings.JsonOnly)
+            {
+                var jsonObj = new
+                {
+                    algorithm = result.Algorithm.ToString(),
+                    keySize = result.KeySize,
+                    createdAtUtc = result.CreatedAtUtc,
+                    publicKeyBytes = result.PublicKeyBytes,
+                    privateKeyBytes = result.PrivateKeyBytes,
+                    publicKey = result.PublicKeyString,
+                    privateKey = result.PrivateKeyString,
+                    passwordProtected = !string.IsNullOrEmpty(result.PrivateKeyString) &&
+                                        result.PrivateKeyString.Contains("ENCRYPTED")
+                };
+                Console.WriteLine(JsonSerializer.Serialize(jsonObj, new JsonSerializerOptions { WriteIndented = true }));
+            }
+            else
+            {
+                AnsiConsole.MarkupLine("[bold green] RSA keys generated (keystring mode)![/]");
+                AnsiConsole.MarkupLine($"[grey]Size:[/] [cyan]{result.KeySize} bits[/]");
+                AnsiConsole.MarkupLine("");
+                AnsiConsole.MarkupLine("[bold yellow]===== PUBLIC KEY =====[/]");
+                Console.WriteLine(result.PublicKeyString);
+                AnsiConsole.MarkupLine("");
+                AnsiConsole.MarkupLine("[bold yellow]===== PRIVATE KEY =====[/]");
+                Console.WriteLine(result.PrivateKeyString);
+            }
+            return;
+        }
+
+        // Standard file mode output
         if (settings.JsonOnly)
         {
             Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));

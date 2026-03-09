@@ -1,4 +1,5 @@
-﻿using Spectre.Console.Cli;
+﻿using Spectre.Console;
+using Spectre.Console.Cli;
 using System.ComponentModel;
 
 namespace SoftwareSigner.Models;
@@ -10,8 +11,12 @@ public sealed class SignOptions : CommandSettings
     public required string ContentPath { get; init; }
 
     [CommandOption("-k|--key")]
-    [Description("Path to private key PEM file")]
-    public required string PrivateKeyPath { get; init; }
+    [Description("Path to private key PEM file (required unless --privatekeystring is used)")]
+    public string? PrivateKeyPath { get; init; }
+
+    [CommandOption("--privatekeystring")]
+    [Description("Private key PEM string passed directly ")]
+    public string? PrivateKeyString { get; init; }
 
     [CommandOption("-o|--out")]
     [Description("Output path for signature file")]
@@ -34,4 +39,15 @@ public sealed class SignOptions : CommandSettings
     [CommandOption("-v|--verbose")]
     [Description("Show verbose output")]
     public bool Verbose { get; init; }
+
+    public override ValidationResult Validate()
+    {
+        if (string.IsNullOrWhiteSpace(PrivateKeyPath) && string.IsNullOrWhiteSpace(PrivateKeyString))
+            return ValidationResult.Error("You must provide either --key (-k) or --privatekeystring.");
+
+        if (!string.IsNullOrWhiteSpace(PrivateKeyPath) && !string.IsNullOrWhiteSpace(PrivateKeyString))
+            return ValidationResult.Error("Provide only one of --key (-k) or --privatekeystring, not both.");
+
+        return ValidationResult.Success();
+    }
 }

@@ -1,4 +1,5 @@
-﻿using Spectre.Console.Cli;
+﻿using Spectre.Console;
+using Spectre.Console.Cli;
 using System.ComponentModel;
 
 namespace SoftwareVerifier.Models;
@@ -10,12 +11,20 @@ public sealed class VerifyOptions : CommandSettings
     public required string ContentPath { get; init; }
 
     [CommandOption("-k|--key")]
-    [Description("Path to PUBLIC key PEM file")]
-    public required string PublicKeyPath { get; init; }
+    [Description("Path to PUBLIC key PEM file (required unless --publickeystring is used)")]
+    public string? PublicKeyPath { get; init; }
+
+    [CommandOption("--publickeystring")]
+    [Description("Public key PEM string passed directly")]
+    public string? PublicKeyString { get; init; }
 
     [CommandOption("-s|--signature")]
-    [Description("Path to .sig signature file")]
-    public required string SignaturePath { get; init; }
+    [Description("Path to .sig signature file (required unless --signaturestring is used)")]
+    public string? SignaturePath { get; init; }
+
+    [CommandOption("--signaturestring")]
+    [Description("Base64-encoded signature string passed directly")]
+    public string? SignatureString { get; init; }
 
     [CommandOption("-j|--json")]
     [Description("Output result as JSON")]
@@ -28,4 +37,23 @@ public sealed class VerifyOptions : CommandSettings
     [CommandOption("-v|--verbose")]
     [Description("Show verbose output")]
     public bool Verbose { get; init; }
+
+    public override ValidationResult Validate()
+    {
+        // Public key: must provide exactly one source
+        if (string.IsNullOrWhiteSpace(PublicKeyPath) && string.IsNullOrWhiteSpace(PublicKeyString))
+            return ValidationResult.Error("You must provide either --key (-k) or --publickeystring.");
+
+        if (!string.IsNullOrWhiteSpace(PublicKeyPath) && !string.IsNullOrWhiteSpace(PublicKeyString))
+            return ValidationResult.Error("Provide only one of --key (-k) or --publickeystring, not both.");
+
+        // Signature: must provide exactly one source
+        if (string.IsNullOrWhiteSpace(SignaturePath) && string.IsNullOrWhiteSpace(SignatureString))
+            return ValidationResult.Error("You must provide either --signature (-s) or --signaturestring.");
+
+        if (!string.IsNullOrWhiteSpace(SignaturePath) && !string.IsNullOrWhiteSpace(SignatureString))
+            return ValidationResult.Error("Provide only one of --signature (-s) or --signaturestring, not both.");
+
+        return ValidationResult.Success();
+    }
 }

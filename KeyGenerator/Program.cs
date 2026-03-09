@@ -9,8 +9,6 @@ namespace KeyGenerator;
 
 public class Program
 {
-    private static bool _bannerShown = false;
-
     public static async Task<int> Main(string[] args)
     {
         // 1. DIRECT EXECUTION MODE
@@ -46,13 +44,22 @@ public class Program
         }
     }
 
+    private const string AppVersion = "1.0.0";
+
     static async Task<int> RunCommand(string[] args)
     {
+        // Handle --version manually (long-form only) to avoid -v conflicting with --verbose
+        // Works at any position: "generate --version", "--version", etc.
+        if (args.Any(a => a.Equals("--version", StringComparison.OrdinalIgnoreCase)))
+        {
+            AnsiConsole.MarkupLine($"[bold green]cryptoshield-keygen[/] [yellow]{AppVersion}[/]");
+            return ExitCodes.Success;
+        }
+
         var app = new CommandApp();
         app.Configure(config =>
         {
             config.SetApplicationName("cryptoshield-keygen");
-            config.SetApplicationVersion("1.0.0");
 
             config.AddBranch<GenerateOptions>("generate", g =>
             {
@@ -65,7 +72,10 @@ public class Program
                  .WithExample("generate rsa")
                  .WithExample("generate rsa -p MySecretPassword")
                  .WithExample("generate rsa -s 4096 -o ./mykeys -v")
-                 .WithExample("generate rsa", "-s", "4096", "-o", "./prod-keys", "-p", "MySecretPassword", "--verbose");
+                 .WithExample("generate rsa", "-s", "4096", "-o", "./prod-keys", "-p", "MySecretPassword", "--verbose")
+                 .WithExample("generate rsa --keystring")
+                 .WithExample("generate rsa", "-s", "4096", "--keystring", "--json")
+                 .WithExample("generate rsa", "-s", "4096", "-p", "MySecretPassword", "--keystring", "--json");
 
                 g.AddCommand<GenerateEcdsaCommand>("ecdsa")
                  .WithDescription("ECDSA keys (default: P-256, out=keys/)")
@@ -74,7 +84,10 @@ public class Program
                  .WithExample("generate ecdsa", "--curve", "P-384")
                  .WithExample("generate ecdsa", "-p", "MySecret", "-o", "./keys")
                  .WithExample("generate ecdsa --curve P-384 -o ./mykeys -j")
-                 .WithExample("generate ecdsa", "--curve", "P-521", "-o", "./prod-keys", "-p", "MySecretPassword", "--json");
+                 .WithExample("generate ecdsa", "--curve", "P-521", "-o", "./prod-keys", "-p", "MySecretPassword", "--json")
+                 .WithExample("generate ecdsa --keystring")
+                 .WithExample("generate ecdsa", "--curve", "P-384", "--keystring", "--json")
+                 .WithExample("generate ecdsa", "--curve", "P-384", "-p", "MySecretPassword", "--keystring", "--json");
             });
         });
 
@@ -97,17 +110,23 @@ public class Program
             .AddColumns("Command", "Description")
             // Basics
             .AddRow("[cyan]--help / -h[/]", "[dim]Show this help[/]")
-            .AddRow("[cyan]--version / -v[/]", "[dim]Show version[/]")
+            .AddRow("[cyan]--version[/]", "[dim]Show version[/]")
 
             // RSA Examples
             .AddRow("[cyan]generate rsa[/]", "[dim]RSA Default (2048, Plain, ./keys)[/]")
             .AddRow("[cyan]generate rsa -p MySecret[/]", "[dim]RSA Encrypted[/]")
             .AddRow("[cyan]generate rsa -s 4096 -o ./mykeys -p MyPass -v[/]", "[dim]RSA Full (4096, Encrypted, Custom Dir, Verbose)[/]")
+            .AddRow("[cyan]generate rsa --keystring[/]", "[dim]RSA KeyString (output keys to stdout, no files)[/]")
+            .AddRow("[cyan]generate rsa --keystring -j[/]", "[dim]RSA KeyString JSON (cloud/API mode)[/]")
+            .AddRow("[cyan]generate rsa -s 4096 -p MyPass --keystring -j[/]", "[dim]RSA KeyString (4096, Encrypted, JSON)[/]")
 
             // ECDSA Examples
             .AddRow("[cyan]generate ecdsa[/]", "[dim]ECDSA Default (P-256, Plain, ./keys)[/]")
             .AddRow("[cyan]generate ecdsa -p MySecret[/]", "[dim]ECDSA Encrypted[/]")
-            .AddRow("[cyan]generate ecdsa -c P-384 -o ./mykeys -p MyPass -j[/]", "[dim]ECDSA Full (P-384, Encrypted, Custom Dir, JSON)[/]");
+            .AddRow("[cyan]generate ecdsa -c P-384 -o ./mykeys -p MyPass -j[/]", "[dim]ECDSA Full (P-384, Encrypted, Custom Dir, JSON)[/]")
+            .AddRow("[cyan]generate ecdsa --keystring[/]", "[dim]ECDSA KeyString (output keys to stdout, no files)[/]")
+            .AddRow("[cyan]generate ecdsa --keystring -j[/]", "[dim]ECDSA KeyString JSON (cloud/API mode)[/]")
+            .AddRow("[cyan]generate ecdsa -c P-384 -p MyPass --keystring -j[/]", "[dim]ECDSA KeyString (P-384, Encrypted, JSON)[/]");
 
         AnsiConsole.MarkupLine("[bold yellow]Available Commands:[/]");
         AnsiConsole.Write(table);

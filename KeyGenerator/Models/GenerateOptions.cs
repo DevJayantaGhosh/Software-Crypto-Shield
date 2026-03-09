@@ -33,4 +33,8 @@ public sealed class GenerateOptions : CommandSettings
 
     [CommandOption("-v|--verbose")]
     public bool Verbose { get; init; }
+
+    [CommandOption("--keystring")]
+    [Description("Output key strings to stdout")]
+    public bool KeyString { get; init; }
 }
