@@ -496,13 +496,7 @@ dotnet publish SoftwareVerifier  -c Release -r osx-x64 --self-contained true -p:
 
 ```
 
----
 
-## 📜 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
----
 
 <p align="center">
   <strong>🛡️ Software Crypto Shield</strong> — Protect your software with cryptographic integrity.
