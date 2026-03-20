@@ -375,13 +375,11 @@ SoftwareVerifier.exe verify -c ./build --publickeystring "-----BEGIN PUBLIC KEY-
 | Public Key Source | Signature Source | Valid? |
 |---|---|---|
 | `-k <file>` | `-s <file>` | ✅ Classic file mode |
-| `--publickeystring "PEM"` | `-s <file>` | ✅ Hybrid |
-| `-k <file>` | `--signaturestring "B64"` | ✅ Hybrid |
-| `--publickeystring "PEM"` | `--signaturestring "B64"` | ✅ Full cloud/API |
+| `--publickeystring "PEM"` | `--signaturestring "B64"` | ✅ Full cloud API Integration |
 
 ---
 
-## ☁️ Cloud / API Mode
+## ☁️ Cloud API CI/CD Integration Mode
 
 The **string mode** across all three tools enables a **zero-file workflow** ideal for:
 
