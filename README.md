@@ -6,21 +6,8 @@
 
 ---
 
-## 📋 Table of Contents
 
-- [Overview](#-overview)
-- [Architecture](#-architecture)
-- [Getting Started](#-getting-started)
-- [Tools Reference](#-tools-reference)
-  - [KeyGenerator](#1-keygenerator)
-  - [SoftwareSigner](#2-softwaresigner)
-  - [SoftwareVerifier](#3-softwareverifier)
-- [Cloud / API Mode](#-cloud--api-mode)
-- [End-to-End Examples](#-end-to-end-examples)
-- [Build & Publish](#-build--publish)
-- [License](#-license)
 
----
 
 ## 🔍 Overview
 
@@ -100,7 +87,7 @@ Each tool supports **two modes**:
 │               │           │          │                        │
 │               ▼           ▼          ▼                        │
 │ ┌───────────────────────────────────────────────────────────┐ │
-│ │                       Output Mode:                         │ │
+│ │                       Output Mode:                        │ │
 │ │   📁 File    → pem files on disk                          │ │
 │ │   ☁️ String  → --keystring stdout                         │ │
 │ │   📋 JSON    → --json to stdout                           │ │
