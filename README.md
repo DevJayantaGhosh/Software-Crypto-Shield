@@ -84,28 +84,56 @@ Each tool supports **two modes**:
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│                     KEY GENERATION PROCESS                     │
+│                     KEY GENERATION PROCESS                    │
 │                                                               │
 │  Algorithm ──► RSA (2048 / 4096)                              │
 │            ──► ECDSA (P-256 / P-384 / P-521)                  │
 │                         │                                     │
 │                         ▼                                     │
-│               Generate Key Pair                               │
+│                   Generate Key Pair                           │
 │               ┌─────────┬──────────┐                          │
 │               │         │          │                          │
 │               ▼         ▼          ▼                          │
-│          Public Key  Private Key  (Optional)                  │
-│           (.pem)      (.pem)     Password ──► AES-256-CBC     │
-│               │         │        Encrypt     PKCS#8 + PBE     │
+│          Public Key   Private Key   (Optional)                │
+│           (.pem)       (.pem)      Password ──► AES-256-CBC   │
+│               │           │        Encrypt     PKCS#8 + PBE   │
+│               │           │          │                        │
+│               ▼           ▼          ▼                        │
+│ ┌───────────────────────────────────────────────────────────┐ │
+│ │                       Output Mode:                         │ │
+│ │   📁 File    → pem files on disk                          │ │
+│ │   ☁️ String  → --keystring stdout                         │ │
+│ │   📋 JSON    → --json to stdout                           │ │
+│ └───────────────────────────────────────────────────────────┘ │
+└───────────────────────────────────────────────────────────────┘
+
+
+┌───────────────────────────────────────────────────────────────┐
+│                     KEY GENERATION PROCESS                    │
+│                                                               │
+│  Algorithm ──► RSA (2048 / 4096)                              │
+│            ──► ECDSA (P-256 / P-384 / P-521)                  │
+│                         │                                     │
+│                         ▼                                     │
+│                   Generate Key Pair                           │
+│               ┌─────────┬──────────┐                          │
 │               │         │          │                          │
 │               ▼         ▼          ▼                          │
-│         ┌──────────────────────────────────┐                  │
-│         │  Output Mode:                    │                  │
-│         │  📁File    → .pem files on disk │                  │
-│         │  ☁️String  → --keystring stdout │                  │
-│         │  📋JSON    → --json to stdout   │                  │
-│         └──────────────────────────────────┘                  │
-└───────────────────────────────────────────────────────────────┘
+│          Public Key   Private Key   (Optional)                │
+│           (.pem)       (.pem)      Password ──► AES-256-CBC   │
+│               │           │        Encrypt     PKCS#8 + PBE   │
+│               │           │          │                        │
+│               ▼           ▼          ▼                        │
+│       ────────────────────────────────────────────            │
+│  Output Mode:                                                 │
+│    📁 File    → pem files on disk                             |
+│    ☁️ String  → --keystring stdout                            │
+│    📋 JSON    → --json to stdout                              │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+``
+
+
 ```
 
 ### ✍️ Signing
@@ -121,7 +149,7 @@ Each tool supports **two modes**:
 │                                        Signature Bytes        │
 │                                               │               │
 │         ┌──────────────────────────────────┐  │               │
-│         │  Output Mode:                    │◄─┘               │
+│         │  Output Mode:                     │◄─┘              │
 │         │  📁 File    → .sig file on disk  │                  │
 │         │  ☁️  String  → Base64 to stdout  │                  │
 │         │  📋 JSON    → --json to stdout   │                  │
@@ -168,15 +196,40 @@ dotnet build Software-Crypto-Shield.sln
 ### Publish (Standalone Executables)
 
 ```bash
-# Windows x64
-dotnet publish KeyGenerator -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
-dotnet publish SoftwareSigner -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
-dotnet publish SoftwareVerifier -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
 
+# =========================
+# Windows x64
+# =========================
+dotnet publish KeyGenerator      -c Release -r win-x64   --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
+dotnet publish SoftwareSigner    -c Release -r win-x64   --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
+dotnet publish SoftwareVerifier  -c Release -r win-x64   --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
+
+
+
+# =========================
 # Linux x64
-dotnet publish KeyGenerator -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
-dotnet publish SoftwareSigner -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
-dotnet publish SoftwareVerifier -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
+# =========================
+dotnet publish KeyGenerator      -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
+dotnet publish SoftwareSigner    -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
+dotnet publish SoftwareVerifier  -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
+
+
+
+# =========================
+# macOS (Apple Silicon: M1/M2/M3)
+# =========================
+dotnet publish KeyGenerator      -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-arm64/
+dotnet publish SoftwareSigner    -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-arm64/
+dotnet publish SoftwareVerifier  -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-arm64/
+
+
+# =========================
+# macOS (Intel)
+# =========================
+dotnet publish KeyGenerator      -c Release -r osx-x64   --self-contained true -p:PublishSingleFile=true -o ./publish/osx-x64/
+dotnet publish SoftwareSigner    -c Release -r osx-x64   --self-contained true -p:PublishSingleFile=true -o ./publish/osx-x64/
+dotnet publish SoftwareVerifier  -c Release -r osx-x64   --self-contained true -p:PublishSingleFile=true -o ./publish/osx-x64/
+
 ```
 
 ---
@@ -424,20 +477,38 @@ dotnet test Software-Crypto-Shield.sln
 ### Publish Standalone Executables
 
 ```bash
-# Windows
-dotnet publish KeyGenerator -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
-dotnet publish SoftwareSigner -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
-dotnet publish SoftwareVerifier -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
+# =========================
+# Windows (x64)
+# =========================
+dotnet publish KeyGenerator      -c Release -r win-x64   --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
+dotnet publish SoftwareSigner    -c Release -r win-x64   --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
+dotnet publish SoftwareVerifier  -c Release -r win-x64   --self-contained true -p:PublishSingleFile=true -o ./publish/win-x64/
 
-# Linux
-dotnet publish KeyGenerator -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
-dotnet publish SoftwareSigner -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
-dotnet publish SoftwareVerifier -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
 
-# macOS (Apple Silicon)
-dotnet publish KeyGenerator -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-arm64/
-dotnet publish SoftwareSigner -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-arm64/
-dotnet publish SoftwareVerifier -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-arm64/
+# =========================
+# Linux (x64)
+# =========================
+dotnet publish KeyGenerator      -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
+dotnet publish SoftwareSigner    -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
+dotnet publish SoftwareVerifier  -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux-x64/
+
+
+# =========================
+# macOS (Apple Silicon: M1 / M2 / M3)
+# =========================
+dotnet publish KeyGenerator      -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-arm64/
+dotnet publish SoftwareSigner    -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-arm64/
+dotnet publish SoftwareVerifier  -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-arm64/
+
+
+# =========================
+# macOS (Intel x64)
+# =========================
+dotnet publish KeyGenerator      -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-x64/
+dotnet publish SoftwareSigner    -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-x64/
+dotnet publish SoftwareVerifier  -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/osx-x64/
+
+
 ```
 
 ---
