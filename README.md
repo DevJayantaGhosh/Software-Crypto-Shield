@@ -88,9 +88,9 @@ Each tool supports **two modes**:
 │               ▼           ▼          ▼                        │
 │ ┌───────────────────────────────────────────────────────────┐ │
 │ │                       Output Mode:                        │ │
-│ │   📁 File    → pem files on disk                          │ │
-│ │   ☁️ String  → --keystring stdout                         │ │
-│ │   📋 JSON    → --json to stdout                           │ │
+│ │   File    → pem files on disk                             │ │
+│ │   String  → --keystring stdout                            │ │
+│ │   JSON    → --json to stdout                              │ │
 │ └───────────────────────────────────────────────────────────┘ │
 └───────────────────────────────────────────────────────────────┘
 
@@ -113,11 +113,11 @@ Each tool supports **two modes**:
 │               ▼           ▼          ▼                        │
 │       ────────────────────────────────────────────            │
 │  Output Mode:                                                 │
-│    📁 File    → pem files on disk                             |
-│    ☁️ String  → --keystring stdout                            │
-│    📋 JSON    → --json to stdout                              │
-│                                                                │
-└────────────────────────────────────────────────────────────────┘
+│     File    → pem files on disk                               |
+│     String  → --keystring stdout                              │
+│     JSON    → --json to stdout                                │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
 ``
 
 
@@ -136,10 +136,10 @@ Each tool supports **two modes**:
 │                                        Signature Bytes        │
 │                                               │               │
 │         ┌──────────────────────────────────┐  │               │
-│         │  Output Mode:                     │◄─┘              │
-│         │  📁 File    → .sig file on disk  │                  │
-│         │  ☁️  String  → Base64 to stdout  │                  │
-│         │  📋 JSON    → --json to stdout   │                  │
+│         │  Output Mode:                    │◄─┘               │
+│         │  File    → .sig file on disk     │                  │
+│         │  String  → Base64 to stdout      │                  │
+│         │  JSON    → --json to stdout      │                  │
 │         └──────────────────────────────────┘                  │
 └───────────────────────────────────────────────────────────────┘
 ```
@@ -160,8 +160,8 @@ Each tool supports **two modes**:
 │                                               │               │
 │         ┌──────────────────────────────────┐  │               │
 │         │  Result:                         │◄─┘               │
-│         │  ✅ VALID   → integrity intact   │                  │
-│         │  ❌ INVALID → content tampered   │                  │
+│         │   VALID   → integrity intact     │                  │
+│         │   INVALID → content tampered     │                  │
 │         └──────────────────────────────────┘                  │
 └───────────────────────────────────────────────────────────────┘
 ```
